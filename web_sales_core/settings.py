@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'category',
     'product',
     'order',
+    'atest',
     'rest_framework',
 ]
 
@@ -80,15 +81,8 @@ WSGI_APPLICATION = 'web_sales_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sell_web_core',
-        'USER':'root',
-        'PASSWORD':'root',
-        'HOST': 'localhost',
-        'PORT':'3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4'
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',        
     },
 }
 
@@ -139,4 +133,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'customer.User'
 MEDIA_URL ='/images/'
-MEDIA_ROOT = '%s/images/' % BASE_DIR
