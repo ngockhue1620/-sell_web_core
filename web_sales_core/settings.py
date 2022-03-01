@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from . import env
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-67^!$ph$bfns^sp5kdvxrd&(r)im)r@73br_gxd+()9&1n!gia'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -89,15 +90,15 @@ WSGI_APPLICATION = 'web_sales_core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sell_web_core',
-        'USER':'root',
-        'PASSWORD':'root',
-        'HOST': 'localhost',
-        'PORT':'3306',
+        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else env('DB_NAME'),
+        'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else env('DB_USER'),
+        'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else env('DB_PASSWORD'),
+        'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else env('DB_HOST'),
+        'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else env('DB_PORT'),
         'OPTIONS': {
             'charset': 'utf8mb4'
         }
-    },
+    }
 }
 
 
@@ -119,6 +120,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ]
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -148,3 +154,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'customer.User'
 MEDIA_URL ='/images/'
 MEDIA_ROOT = '%s/' % BASE_DIR
+
+KEY_PATH = os.environ["KEY_PATH"]
+with open(KEY_PATH) as f:
+    PRIVATE_KEY = f.read()
+with open(KEY_PATH + ".pub") as f:
+    PUBLIC_KEY = f.read()

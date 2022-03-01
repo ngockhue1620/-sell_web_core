@@ -1,3 +1,28 @@
-from django.shortcuts import render
-
+from tkinter.messagebox import NO
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from .models import User
+from permisstion.token import Token
+from rest_framework.decorators import action
 # Create your views here.
+class UserViewSet(viewsets.ViewSet):
+
+  def list(self, request):
+    return Response({"message": "ok"})
+  
+  @action(methods = ["POST"], detail=False, url_path="login")
+  def login(self, request):
+    data = request.data 
+    password = data.get('password', None)
+    username = data.get('username', None)
+    
+    if not password or not username:
+      return Response({"message": "username and password is not none"}, status=status.HTTP_200_OK)
+    user = User.objects.filter(username = username).first()
+    print(user.id)
+    if user:
+      if user.check_password(password):
+        token = Token.generate_token(user)
+        return Response({"message": "Login successs", "token": token}, status=status.HTTP_200_OK)
+       
+    return Response({"message": "User is not exists"}, status=status.HTTP_200_OK)
