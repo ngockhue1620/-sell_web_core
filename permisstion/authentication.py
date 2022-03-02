@@ -6,8 +6,13 @@ class Authentication(BasePermission):
     # print(request.META)
     # print(request.META.get('HTTP_AUTHORIZATION'))
     bear_token = request.META.get('HTTP_AUTHORIZATION')
+    if  not bear_token:
+      return False
     token = Token.get_token(bear_token)
-    is_alow = Token.validate_token(token)
-    if is_alow:
+    if not token:
+      return False
+    user = Token.validate_token(token)
+    if user:
+      request.user = user
       return True
     return False

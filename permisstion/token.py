@@ -20,5 +20,9 @@ class Token():
       return False
   
   def get_token(value):
-    token = value.split(' ')[1]
-    return token
+    try:
+      token = value.split(' ')[1]
+      return token
+    except:
+      return False
+    

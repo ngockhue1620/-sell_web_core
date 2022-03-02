@@ -20,6 +20,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "address",
             "phone",
             "total",
+            "status",
             "order_detail",
             "id",
         ]
@@ -29,17 +30,13 @@ class OrderSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        order_details = validated_data.pop("order_detail")
-        print(validated_data)
-       
-        order = Order.objects.create(**validated_data)
+        order_details = validated_data.pop("order_detail")       
+        order = Order.objects.create(**validated_data,status = 1)
         for product in order_details:
-            print(product)
             OrderDetail.objects.create(
                 product=product.get('product'),
                 quantity=product.get("quantity"),
                 price=product.get("price"),
-                order=order,
+                order=order,            
             )
-
         return order

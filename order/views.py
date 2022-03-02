@@ -2,11 +2,18 @@ from lib2to3.pgen2 import token
 from msilib.schema import ReserveCost
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+
+from order.models import Order
 from .serializers import OrderSerializer
 from rest_framework.permissions import IsAuthenticated
 from permisstion.authentication import Authentication, Token
-class OrderViewSet(viewsets.ViewSet):
+class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [Authentication]
+
+    def list(self, request):
+        orders = Order.objects.filter(user_id = request.user.get('id'))
+        serializer = OrderSerializer(orders, many =True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     def create(self, request):
         data = request.data
         order_detail = data.get("order_detail", None)
@@ -28,16 +35,13 @@ class OrderViewSet(viewsets.ViewSet):
             return Response(
                 {"message": "Duplicate item"}, status=status.HTTP_400_BAD_REQUEST
             )
-        bear_token = request.META.get('HTTP_AUTHORIZATION')
-        token_value = Token.get_token(bear_token)
-        user = Token.validate_token(token_value)
+     
         # self.initial_data.update({"user": user})
         data.update({
-            "user": user.get('id')
+            "user": request.user.get('id')
         })
-        print("hi",data)
         serializer = OrderSerializer(data=data)
         print(serializer.is_valid())
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"order": serializer.data, "message": "Order success"}, status=status.HTTP_201_CREATED)

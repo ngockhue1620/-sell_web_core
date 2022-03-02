@@ -2,6 +2,11 @@ from django.db import models
 from customer.models import User
 from product.models import Product
 
+STATUS_ORDER =(
+    ("IN_PROGRESS", 1),
+    ("DONE", 2),
+    ("CLOSE", 3)
+)
 
 class Order(models.Model):
     note = models.CharField(max_length=255, null=True)
@@ -11,6 +16,7 @@ class Order(models.Model):
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     total = models.BigIntegerField()
+    status = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
