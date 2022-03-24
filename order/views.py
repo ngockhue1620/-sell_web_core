@@ -1,17 +1,17 @@
-from lib2to3.pgen2 import token
-from msilib.schema import ReserveCost
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from order.models import Order
 from .serializers import OrderSerializer
-from rest_framework.permissions import IsAuthenticated
 from permisstion.authentication import Authentication, Token
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(viewsets.ViewSet):
     permission_classes = [Authentication]
 
     def list(self, request):
-        orders = Order.objects.filter(user_id = request.user.get('id'))
+        fl = {}
+        status_order = request.GET.get('status', 1)
+        fl.update({'status': status_order, 'user_id': request.user.get('id')})
+        orders = Order.objects.filter(**fl)
         serializer = OrderSerializer(orders, many =True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     def create(self, request):

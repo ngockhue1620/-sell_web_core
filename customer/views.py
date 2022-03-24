@@ -11,6 +11,13 @@ class UserViewSet(viewsets.ViewSet):
   def list(self, request):
     return Response({"message": "ok"})
   
+  def create(self, request):
+    data = request.data 
+    serializer = UserSerializers(data= data)
+    if serializer.is_valid(raise_exception=True):
+      serializer.save()
+      return Response({"message": "Create User success"}, status=status.HTTP_200_OK)
+
   @action(methods = ["POST"], detail=False, url_path="login")
   def login(self, request):
     data = request.data 
