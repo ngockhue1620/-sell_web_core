@@ -1,13 +1,17 @@
 from rest_framework import serializers
 from .models import Order, OrderDetail
-from permisstion.token import Token
+from product.serializers import ProductSerializer 
 
-class OrderDetailSerializer(serializers.ModelSerializer):
-    # product = serializers.CharField()
+class GetOrderDetailSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
     class Meta:
         model = OrderDetail
         fields = ["product", "price", "id", "quantity"]
 
+class OrderDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderDetail
+        fields = ["product", "price", "id", "quantity"]
 
 class OrderSerializer(serializers.ModelSerializer):
     order_detail = OrderDetailSerializer(many=True, required = True)
@@ -15,6 +19,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "created_at",
             "note",
             "user",
             "address",
@@ -24,9 +29,10 @@ class OrderSerializer(serializers.ModelSerializer):
             "order_detail",
             "id",
         ]
-        optional_fields = ["note"]
+        optional_fields = ["note", "created_at"]
         extra_kwargs = {
             'user': {'write_only': True},
+            'created_at': {'read_only': True}
         }
 
     def create(self, validated_data):
@@ -40,3 +46,25 @@ class OrderSerializer(serializers.ModelSerializer):
                 order=order,            
             )
         return order
+
+class GetOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            "created_at",
+            "note",
+            "user",
+            "address",
+            "phone",
+            "total",
+            "status",
+            "id",
+        ]
+        optional_fields = ["note", "created_at"]
+        extra_kwargs = {
+            'user': {'write_only': True},
+            'created_at': {'read_only': True}
+        }
+
+
+
