@@ -5,6 +5,7 @@ class Token():
     private_key = settings.PRIVATE_KEY
     user = {
       "id": user.id,
+      "admin": user.is_superuser
     }
     token = jwt.encode(user, private_key, algorithm="RS256")
     return token
