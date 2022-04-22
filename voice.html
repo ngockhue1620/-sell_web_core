@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Page Title</title>
+</head>
+
+<body>
+
+  <h1>This is a Heading</h1>
+  <p>This is a paragraph.</p>
+  <div id="audio_preview">
+
+  </div>
+  <script>
+    var audio = document.getElementById("audio_preview");
+
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(stream => {
+        // create media recorder instance to initialize recording 
+        this.recorder = new MediaRecorder(stream);
+      })
+
+    var onRecordFail = function (e) {
+      console.log(e);
+    }
+  </script>
+</body>
+
+</html>
