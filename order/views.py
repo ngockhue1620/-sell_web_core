@@ -2,20 +2,31 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from order.models import Order, OrderDetail
+from product.models import Product
 from .serializers import OrderSerializer, GetOrderSerializer, GetOrderDetailSerializer
 from .const.status import OrderStatus
 from permisstion.authentication import Authentication
+from .service.order_service import OrderService
+
+
 class OrderViewSet(viewsets.ViewSet):
     permission_classes = [Authentication]
 
     def list(self, request):
         fl = {}
-        status_order = request.GET.get('status', 1)
+        status_order = request.GET.get('status', OrderStatus.IN_PROGRESS)
+        is_admin = request.user.get("admin", False)
         fl.update({'status': status_order})
-        if request.user and not request.user.get("admin", False):
+        if request.user and not is_admin:
             fl.update({'status': status_order, 'user_id': request.user.get('id')})
         orders = Order.objects.filter(**fl)
-        serializer = GetOrderSerializer(orders, many =True)
+        if is_admin:
+            serializer = OrderSerializer(orders, many =True)
+        else:
+            serializer = GetOrderSerializer(orders, many =True)
+        if is_admin and int(status_order) == OrderStatus.IN_PROGRESS:            
+            orders = OrderService.handle_order_status(serializer.data)
+            return Response(orders, status=status.HTTP_200_OK)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     def create(self, request):
@@ -54,11 +65,28 @@ class OrderViewSet(viewsets.ViewSet):
         if not request.user.get("admin", False):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            order = Order.objects.get(id=pk)
+            order = Order.objects.get(id=pk).select_related()
             order.status = OrderStatus.DONE
+            order_details = order.order_detail
+            product_ids = []
+            order_detail_temp = {}
+            for detail in order_details:
+
+                product_ids.append(detail.product)
+                order_detail_temp[f"{detail.product}"] = detail
+            products =  Product.objects.filter(id__in = product_ids)
+            update_list = []
+            for product in products:
+                if int(product.quantity) > int(order_detail_temp[f"{product.id}"].quantity):
+                    product.quantity  =  int(product.quantity) - int(order_detail_temp[f"{product.id}"].quantity)
+                else:
+                    return Response({"message": "Khong du hang"}, status=status.HTTP_400_BAD_REQUEST)
+                update_list.append(product)
+            Product.objects.bulk_update(update_list,["quantity"])
             order.save()
             return Response(status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
+            print(e)
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 class OrderDetailViewSet(viewsets.ViewSet):
