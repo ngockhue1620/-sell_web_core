@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-
+from django.db.models import Prefetch
 from order.models import Order, OrderDetail
 from product.models import Product
 from .serializers import OrderSerializer, GetOrderSerializer, GetOrderDetailSerializer
@@ -65,15 +65,15 @@ class OrderViewSet(viewsets.ViewSet):
         if not request.user.get("admin", False):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            order = Order.objects.get(id=pk).select_related()
+            order = Order.objects.get(id=pk)
             order.status = OrderStatus.DONE
-            order_details = order.order_detail
+            order_details = OrderDetail.objects.filter(order_id = order.id)
             product_ids = []
             order_detail_temp = {}
             for detail in order_details:
 
-                product_ids.append(detail.product)
-                order_detail_temp[f"{detail.product}"] = detail
+                product_ids.append(detail.product.id)
+                order_detail_temp[f"{detail.product.id}"] = detail
             products =  Product.objects.filter(id__in = product_ids)
             update_list = []
             for product in products:

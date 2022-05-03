@@ -5,8 +5,14 @@ from .models import User
 from permisstion.token import Token
 from rest_framework.decorators import action
 from .serializer import UserSerializers
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+from permisstion.authentication import Authentication
+
 # Create your views here.
-class UserViewSet(viewsets.ViewSet):
+class UserViewSet(viewsets.ModelViewSet):
+  queryset = User.objects.all()
+  serializer_class = UserSerializers
 
   def list(self, request):
     return Response({"message": "ok"})
@@ -34,3 +40,27 @@ class UserViewSet(viewsets.ViewSet):
         return Response({"message": "Login successs", "token": token, "user": serializer.data}, status=status.HTTP_200_OK)
        
     return Response({"message": "User is not exists"}, status=status.HTTP_400_BAD_REQUEST)
+
+  
+  @action(methods = ["POST"], detail=False, url_path="update_password", permission_classes=[Authentication]) 
+  def update_password(self, request):
+    data = request.data 
+    old_password = data.get("old_password", "")
+    new_password = data.get("new_password", "")
+    username = data.get("username", "")
+    avatar = data.get("avatar", "")
+    re_check_new_password = data.get("re_check_new_password", "")
+    if new_password and old_password and re_check_new_password == new_password:
+      user = get_object_or_404(User, pk=request.user.get('id'))
+      if user.username == username and user.check_password(old_password):
+        user.password = make_password(new_password)
+        if avatar:
+          user.avatar = avatar
+        user.save()
+        serializer = UserSerializers(user)
+        return Response({"message": "Cập nhập thành công", "user": serializer.data}, status=status.HTTP_200_OK)
+      else:
+        return Response({"message": "Mật khẩu củ không đúng"}, status=status.HTTP_400_BAD_REQUEST)     
+                
+    else: 
+      return Response({"message": "Mật khẩu không trùng khớp"}, status=status.HTTP_400_BAD_REQUEST)
