@@ -90,18 +90,10 @@ WSGI_APPLICATION = 'web_sales_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else env('DB_NAME'),
-        'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else env('DB_USER'),
-        'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else env('DB_PASSWORD'),
-        'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else env('DB_HOST'),
-        'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else env('DB_PORT'),
-        'OPTIONS': {
-            'charset': 'utf8mb4'
-        }
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',        
+    },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -154,10 +146,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'customer.User'
 MEDIA_URL ='/images/'
-MEDIA_ROOT = '%s/' % BASE_DIR
+MEDIA_ROOT = os.path.join(BASE_DIR, '')
 
 KEY_PATH = os.environ["KEY_PATH"]
 with open(KEY_PATH) as f:
     PRIVATE_KEY = f.read()
 with open(KEY_PATH + ".pub") as f:
     PUBLIC_KEY = f.read()
+    PUBLIC_KEY = f.read()
+

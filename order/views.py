@@ -5,9 +5,9 @@ from order.models import Order, OrderDetail
 from product.models import Product
 from .serializers import OrderSerializer, GetOrderSerializer, GetOrderDetailSerializer
 from .const.status import OrderStatus
-from permisstion.authentication import Authentication
+from permisstion.authentication import Authentication, Token
 from .service.order_service import OrderService
-
+from rest_framework.decorators import action
 
 class OrderViewSet(viewsets.ViewSet):
     permission_classes = [Authentication]
@@ -88,6 +88,16 @@ class OrderViewSet(viewsets.ViewSet):
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods = ["get"], detail=False, url_path="list_check", permission_classes=[])
+    def list_check(self, request):
+        
+        orders = Order.objects.all()
+       
+        serializer = GetOrderSerializer(orders, many =True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 
 class OrderDetailViewSet(viewsets.ViewSet):
     # permission_classes = [Authentication]   
