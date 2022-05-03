@@ -153,5 +153,3 @@ with open(KEY_PATH) as f:
     PRIVATE_KEY = f.read()
 with open(KEY_PATH + ".pub") as f:
     PUBLIC_KEY = f.read()
-    PUBLIC_KEY = f.read()
-

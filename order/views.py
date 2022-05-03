@@ -1,11 +1,10 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from django.db.models import Prefetch
 from order.models import Order, OrderDetail
 from product.models import Product
 from .serializers import OrderSerializer, GetOrderSerializer, GetOrderDetailSerializer
 from .const.status import OrderStatus
-from permisstion.authentication import Authentication, Token
+from permisstion.authentication import Authentication
 from .service.order_service import OrderService
 from rest_framework.decorators import action
 
