@@ -95,7 +95,6 @@ DATABASES = {
     },
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -147,10 +146,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'customer.User'
 MEDIA_URL ='/images/'
-MEDIA_ROOT = '%s/' % BASE_DIR
+MEDIA_ROOT = os.path.join(BASE_DIR, '')
 
 KEY_PATH = os.environ["KEY_PATH"]
 with open(KEY_PATH) as f:
     PRIVATE_KEY = f.read()
 with open(KEY_PATH + ".pub") as f:
     PUBLIC_KEY = f.read()
+    PUBLIC_KEY = f.read()
+
