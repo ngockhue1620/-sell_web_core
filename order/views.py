@@ -1,3 +1,4 @@
+from msilib.schema import ReserveCost
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from order.models import Order, OrderDetail
@@ -6,7 +7,7 @@ from .serializers import OrderSerializer, GetOrderSerializer, GetOrderDetailSeri
 from .const.status import OrderStatus
 from permisstion.authentication import Authentication
 from .service.order_service import OrderService
-from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 
 class OrderViewSet(viewsets.ViewSet):
     permission_classes = [Authentication]
@@ -18,7 +19,7 @@ class OrderViewSet(viewsets.ViewSet):
         fl.update({'status': status_order})
         if request.user and not is_admin:
             fl.update({'status': status_order, 'user_id': request.user.get('id')})
-        orders = Order.objects.filter(**fl)
+        orders = Order.objects.filter(**fl).order_by('-id')
         if is_admin:
             serializer = OrderSerializer(orders, many =True)
         else:
@@ -88,22 +89,19 @@ class OrderViewSet(viewsets.ViewSet):
             print(e)
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    @action(methods = ["get"], detail=False, url_path="list_check", permission_classes=[])
-    def list_check(self, request):
-        
-        orders = Order.objects.all()
-       
-        serializer = GetOrderSerializer(orders, many =True)
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
-        
 
 class OrderDetailViewSet(viewsets.ViewSet):
-    # permission_classes = [Authentication]   
+    permission_classes = [Authentication]   
 
 
-    def retrieve(self, request, pk=None):      
-        data = OrderDetail.objects.filter(order_id = pk)
+    def retrieve(self, request, pk=None):   
+        is_admin = request.user.get("admin", False)
+        user_id = request.user.get("id", 0)
+        order = get_object_or_404(Order, id=pk)
+        if is_admin or order.user_id == user_id:
+            data = OrderDetail.objects.filter(order_id = pk)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         if data:
             serizlizer = GetOrderDetailSerializer(data, many=True)
             return Response(serizlizer.data, status=status.HTTP_200_OK)

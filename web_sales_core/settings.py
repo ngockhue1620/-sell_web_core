@@ -26,7 +26,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -88,26 +88,26 @@ WSGI_APPLICATION = 'web_sales_core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',        
-    },
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else env('DB_NAME'),
-#         'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else env('DB_USER'),
-#         'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else env('DB_PASSWORD'),
-#         'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else env('DB_HOST'),
-#         'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else env('DB_PORT'),
-#         'OPTIONS': {
-#             'charset': 'utf8mb4'
-#         }
-#     }
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',        
+#     },
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else env('DB_NAME'),
+        'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else env('DB_USER'),
+        'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else env('DB_PASSWORD'),
+        'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else env('DB_HOST'),
+        'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else env('DB_PORT'),
+        'OPTIONS': {
+            'charset': 'utf8mb4'
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -127,11 +127,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.IsAuthenticated',
-#     ]
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 9
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

@@ -7,7 +7,6 @@ from rest_framework.parsers import MultiPartParser
 from .const.category_constain import CategoryStatus
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-
 # Create your views here.
 from .models import Category
 
@@ -16,7 +15,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
   queryset = Category.objects.filter(is_activate=CategoryStatus.ACTIVE)
   serializer_class = CategorySerializers
   parser_classes= [MultiPartParser, ]
-  
+  pagination_class  =  None
   # def create(self, request, *args, **kwargs):
   #     serializer = self.get_serializer(data=request.data)
   #     serializer.is_valid(raise_exception=True)
